@@ -5,7 +5,7 @@ android {
     buildToolsVersion "23.0.3"
 
     defaultConfig {
-        applicationId "com.yuyh.easydao"
+        applicationId "com.yuyh.easydao.sample"
         minSdkVersion 14
         targetSdkVersion 24
         versionCode 1
@@ -20,7 +20,7 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.12'
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:24.0.0-beta1'
+    compile project(':easydao')
 }

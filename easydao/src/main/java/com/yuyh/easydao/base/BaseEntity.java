@@ -13,6 +13,9 @@ public abstract class BaseEntity {
     @AutoIncrement
     private Integer id;
 
+    public BaseEntity() {
+    }
+
     public Integer getId() {
         return id;
     }
