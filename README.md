@@ -1,4 +1,7 @@
 # easyDAO
+
+[![Platform](https://img.shields.io/badge/platform-android-green.svg)](http://developer.android.com/index.html)
+[![API](https://img.shields.io/badge/API-9%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=8)<br/>
 easyDAO is a light-weight&amp;fast ORM library for Android that maps objects to SQLite , it becomes much easier to operate the SQLite database.
 
 ## Features
@@ -26,20 +29,19 @@ dependencies {
 
 1. The name of getter/setter method MUST strictly follow the rule: getElement, setElement, setOk, isOk.
 (i.e. get/set + element name with the first character in upper case),
-NOTE that the auto generated getters/setters of the Boolean/boolean element is following this rule. e.g.:
-```java
-@Column
-private boolean isOk;
+NOTE that the auto generated getters/setters of the Boolean/boolean element is following this rule. e.g.
+    ```java
+    @Column
+    private boolean isOk;
 
-public boolean isOk(){
-    return isOk;
-}
+    public boolean isOk(){
+        return isOk;
+    }
 
-public void setOk(boolean isOk){
-    this.isOk = isOk;
-}
-```
-
+    public void setOk(boolean isOk){
+        this.isOk = isOk;
+    }
+    ```
 2. For elements with Boolean/boolean type, the internal type in database is INTEGER, 1 means true, 0 means false.
 You may notice this if you want to find with condition.
 
