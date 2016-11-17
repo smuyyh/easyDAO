@@ -1,7 +1,7 @@
 # easyDAO
 
 [![Platform](https://img.shields.io/badge/platform-android-green.svg)](http://developer.android.com/index.html)
-[![API](https://img.shields.io/badge/API-9%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=8)<br/>
+[![API](https://img.shields.io/badge/API-8%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=8)<br/>
 
 easyDAO is a light-weight&amp;fast ORM library for Android that maps objects to SQLite , it becomes much easier to operate the SQLite database.
 
