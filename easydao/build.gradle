@@ -9,7 +9,7 @@ android {
     resourcePrefix "easyDAO"
 
     defaultConfig {
-        minSdkVersion 14
+        minSdkVersion 8
         targetSdkVersion 24
         versionCode 1
         versionName "1.0.0"
