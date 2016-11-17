@@ -55,7 +55,7 @@ public class DAO<T extends BaseEntity> extends SQLiteOpenHelper implements IDAO<
      * constructor. only for operate the database and cannot operate the specified table.
      *
      * @param context to use to open or create the database
-     * @param dbName  of the database name, it will be stored in /data/data/package_name/files
+     * @param dbName  of the database name, it will be stored in /data/data/%package_name%/files
      * @param version number of the database (starting at 1)
      */
     public DAO(Context context, String dbName, int version) {
@@ -66,7 +66,7 @@ public class DAO<T extends BaseEntity> extends SQLiteOpenHelper implements IDAO<
      * constructor
      *
      * @param context     to use to open or create the database
-     * @param dbName      of the database name, it will be stored in /data/data/package_name/files
+     * @param dbName      of the database name, it will be stored in /data/data/%package_name%/files
      * @param tableName   the name of table to needs to be operated
      * @param entityClass class for entity
      * @param version     number of the database (starting at 1)
