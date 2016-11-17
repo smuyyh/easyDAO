@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">easyDAO</string>
+    <string name="confirm">confirm</string>
+    <string name="cancel">cancel</string>
+
+    <string name="create_database">create/open database</string>
+    <string name="delete_database">delete database</string>
+    <string name="create_table">create/open table</string>
+    <string name="drop_table">drop table</string>
+    <string name="drop_all_table">drop all table</string>
+    <string name="save_entity">save entity</string>
+    <string name="delete_entity">delete entity by ids</string>
+    <string name="find_last_entity">find last entity</string>
+    <string name="delete_all_entity">delete all entity</string>
+    <string name="update_entity_by_condition">update entity by condition</string>
+    <string name="find_entity_by_condition">find entity by condition</string>
+    <string name="find_all_entity">find all entity / get count</string>
 </resources>

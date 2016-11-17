@@ -1,3 +1,18 @@
+/**
+ * Copyright (C) 2016 smuyyh
+ * <p/>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.yuyh.easydao.impl;
 
 import android.content.ContentValues;
@@ -14,7 +29,6 @@ import com.yuyh.easydao.utils.LogUtils;
 import com.yuyh.easydao.utils.ORMUtils;
 import com.yuyh.easydao.utils.Utils;
 
-import java.io.File;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.List;
@@ -37,12 +51,28 @@ public class DAO<T extends BaseEntity> extends SQLiteOpenHelper implements IDAO<
 
     public DBUpdateInfo info = new DBUpdateInfo();
 
+    /**
+     * constructor. only for operate the database and cannot operate the specified table.
+     *
+     * @param context to use to open or create the database
+     * @param dbName  of the database name, it will be stored in /data/data/package_name/files
+     * @param version number of the database (starting at 1)
+     */
     public DAO(Context context, String dbName, int version) {
         this(context, dbName, null, null, version);
     }
 
+    /**
+     * constructor
+     *
+     * @param context     to use to open or create the database
+     * @param dbName      of the database name, it will be stored in /data/data/package_name/files
+     * @param tableName   the name of table to needs to be operated
+     * @param entityClass class for entity
+     * @param version     number of the database (starting at 1)
+     */
     public DAO(Context context, String dbName, String tableName, Class<T> entityClass, int version) {
-        super(context, context.getFilesDir() + File.separator + dbName, null, version);
+        super(context, dbName, null, version);
 
         this.mContext = context;
         this.mDBName = dbName;
@@ -74,6 +104,14 @@ public class DAO<T extends BaseEntity> extends SQLiteOpenHelper implements IDAO<
     }
 
     @Override
+    public void initTable(String tableName, Class<T> clazz) {
+        this.mTableName = tableName;
+        this.entityClass = clazz;
+
+        this.fields = Utils.getDeclaredField(entityClass);
+    }
+
+    @Override
     public SQLiteDatabase getDatabase() {
         return db == null ? (db = getWritableDatabase()) : db;
     }
@@ -100,13 +138,16 @@ public class DAO<T extends BaseEntity> extends SQLiteOpenHelper implements IDAO<
         }
     }
 
-    public boolean isTableExist() throws DBException {
+    @Override
+    public boolean isTableExist(String tableName) throws DBException {
         boolean isExist = false;
+        if (TextUtils.isEmpty(tableName))
+            return isExist;
 
         try {
-            openDB(true);
+            openDB(false);
 
-            String sql = "SELECT COUNT(*) FROM Sqlite_master WHERE TYPE ='table' AND NAME ='" + mTableName.trim() + "' ";
+            String sql = "SELECT COUNT(*) FROM Sqlite_master WHERE TYPE ='table' AND NAME ='" + tableName.trim() + "' ";
             Cursor cursor = db.rawQuery(sql, null);
             if (cursor.moveToNext()) {
                 int count = cursor.getInt(0);
@@ -123,11 +164,22 @@ public class DAO<T extends BaseEntity> extends SQLiteOpenHelper implements IDAO<
         }
     }
 
+    @Override
+    public boolean isTableExist() throws DBException {
+        return !TextUtils.isEmpty(mTableName) && isTableExist(mTableName);
+    }
+
+    @Override
     public void createTable() throws DBException {
+        createTable(entityClass, mTableName);
+    }
+
+    @Override
+    public <T> void createTable(Class<T> entityClass, String tableName) throws DBException {
         try {
             openDB(true);
 
-            String strCreateTable = ORMUtils.genCreateTableSQL(entityClass, mTableName);
+            String strCreateTable = ORMUtils.genCreateTableSQL(entityClass, tableName);
             LogUtils.i(strCreateTable);
             db.execSQL(strCreateTable);
         } catch (Exception e) {
@@ -158,7 +210,30 @@ public class DAO<T extends BaseEntity> extends SQLiteOpenHelper implements IDAO<
 
     @Override
     public void dropAllTable() throws DBException {
+        String strTabSql = "select name from sqlite_master where type='table' order by name";
+        LogUtils.d("dropAllTable:" + strTabSql);
 
+        try {
+            openDB(false);
+
+            db.beginTransaction();
+            Cursor cursor = db.rawQuery(strTabSql, null);
+            while (cursor.moveToNext()) {
+                String name = cursor.getString(0);
+                if (name.equals("sqlite_sequence")) {
+                    continue;
+                }
+                String strDelSql = "DROP TABLE " + name;
+                LogUtils.d(strDelSql);
+                db.execSQL(strDelSql);
+            }
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            throw new DBException(null);
+        } finally {
+            db.endTransaction();
+            closeDB();
+        }
     }
 
     @Override
@@ -304,10 +379,28 @@ public class DAO<T extends BaseEntity> extends SQLiteOpenHelper implements IDAO<
 
     @Override
     public void updateByCondition(String condition, T entity) throws DBException {
+        if (entity == null) {
+            throw new DBException(null);
+        }
+
+        ContentValues values;
+
         try {
             openDB(true);
-        } catch (Exception e) {
 
+            values = Utils.putValue(fields, entity);
+            values.remove("id");
+            if (values.size() <= 0) {
+                throw new DBException(null);
+            }
+
+            int flag = db.update(mTableName, values, condition, null);
+            if (flag < 1) {
+                throw new DBException(null);
+            }
+
+        } catch (Exception e) {
+            throw new DBException(null);
         } finally {
             closeDB();
         }
@@ -409,6 +502,12 @@ public class DAO<T extends BaseEntity> extends SQLiteOpenHelper implements IDAO<
         return null;
     }
 
+    /**
+     * Create and/or open a database that will be used for reading and writing.
+     *
+     * @param checkTable True if need check mTableName, false otherwise
+     * @throws DBException
+     */
     private void openDB(boolean checkTable) throws DBException {
         if (checkTable && TextUtils.isEmpty(mTableName)) {
             throw new DBException(null);
@@ -416,12 +515,19 @@ public class DAO<T extends BaseEntity> extends SQLiteOpenHelper implements IDAO<
         db = getWritableDatabase();
     }
 
+    /**
+     * Releases a reference to the database
+     * closing the database if the last reference was released.
+     */
     private void closeDB() {
         if (db != null && db.isOpen()) {
             db.close();
         }
     }
 
+    /**
+     * database version update information
+     */
     public class DBUpdateInfo {
         public boolean isUpdate = false;
         public int from;

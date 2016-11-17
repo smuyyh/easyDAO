@@ -1,3 +1,18 @@
+/**
+ * Copyright (C) 2016 smuyyh
+ * <p/>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.yuyh.easydao.interfaces;
 
 import android.database.sqlite.SQLiteDatabase;
@@ -7,7 +22,16 @@ import com.yuyh.easydao.exception.DBException;
 
 import java.util.List;
 
+/**
+ * Data Access Object interface
+ *
+ * @param <T>
+ * @author yuyh.
+ * @date 2016/11/16.
+ */
 public interface IDAO<T extends BaseEntity> {
+
+    void initTable(String tableName, Class<T> clazz);
 
     /**
      * get the sqlite database object
@@ -23,6 +47,31 @@ public interface IDAO<T extends BaseEntity> {
      * @throws DBException
      */
     long getCount() throws DBException;
+
+    boolean isTableExist(String tableName) throws DBException;
+
+    /**
+     * check table exists
+     *
+     * @return
+     * @throws DBException
+     */
+    boolean isTableExist() throws DBException;
+
+    /**
+     * create table
+     *
+     * @throws DBException
+     */
+    void createTable() throws DBException;
+
+    /**
+     * create table
+     *
+     * @param tableName table name
+     * @throws DBException
+     */
+    <T> void createTable(Class<T> entityClass, String tableName) throws DBException;
 
     /**
      * drop table
