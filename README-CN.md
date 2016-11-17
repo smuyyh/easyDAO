@@ -3,36 +3,33 @@
 [![Platform](https://img.shields.io/badge/platform-android-green.svg)](http://developer.android.com/index.html)
 [![API](https://img.shields.io/badge/API-9%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=8)<br/>
 
-easyDAO is a light-weight&amp;fast ORM library for Android that maps objects to SQLite , it becomes much easier to operate the SQLite database.
+easyDAO是一个快速&轻量级的Android SQLite ORM映射框架，尽可能的简化数据库操作。
 
-[中文文档](https://github.com/smuyyh/easyDAO/blob/master/README-CN.md)
+[English Doc](https://github.com/smuyyh/easyDAO/blob/master/README.md)
 
-## Features
-1. easyDAO makes the database CRUD easier for Android.
-2. maps objects to SQLite by annotation.
+## 特征
+1. easyDAO简化了数据库的增删改查操作.
+2. 通过注解的方式进行数据库对象映射.
 
-## Download
+## 依赖
 ```
 dependencies {
     compile 'com.yuyh.easydao:easydao:1.0.0'
 }
 ```
 
-## A Brief Guide
+## 简介
 ```
-1. Declare a public entity class inherit from {@link com.yuyh.easydao.base.BaseEntity}.
-2. Use notation '@{@link com.yuyh.easydao.annotation.Column}' to make an element a column in the database,
-   the column name will be the same as the element.
-3. Every element with the '@Column' anotation MUST have getter/setter.
-4. Call {@link IDB#getDatabase(int, String, String, Class, IDBListener)} to create the database and table,
-   and use the returned value to operate the database.
+1. 定义一个公共类，继承于{@link com.yuyh.easydao.base.BaseEntity}.
+2. 使用'@Column'注解属性以便在数据库表创建一个列, 列名和属性名会保持一致.
+3. 每一个带有'@Column'注解的属性都必须有getter/setter方法.
+4. 调用{@link IDb#getDb(int, String, String, Class, IDbListener)}方法来创建数据库和表, 用返回值来操作数据库.
 ```
 
-## Notices
+## 注意事项（重要！！！）
 
-1. The name of getter/setter method MUST strictly follow the rule: getElement, setElement, setOk, isOk.
-(i.e. get/set + element name with the first character in upper case),
-NOTE that the auto generated getters/setters of the Boolean/boolean element is following this rule. e.g.
+1. getter/setter方法必须严格遵循以下规则: getElement, setElement (即: get/set + 首字母大写的属性名).
+这里需要注意的是，通过eclipse或as自动生成的Bool类型的getter/setter方法也是遵循该规律的，请勿手动再改。如下：
     ```java
     @Column
     private boolean isOk;
@@ -45,40 +42,39 @@ NOTE that the auto generated getters/setters of the Boolean/boolean element is f
         this.isOk = isOk;
     }
     ```
-2. For elements with Boolean/boolean type, the internal type in database is INTEGER, 1 means true, 0 means false.
-You may notice this if you want to find with condition.
+2. 对于类型为Boolean/boolean的属性来说, 他们在数据库内部表示是用INTEGER类型, 1 代表true, 0 代表false. 所以如果要通过条件语句操作，就要注意这个地方了.
 
-3. By default, the value of the column can NOT be null, so that it would NOT save to database if the value is NULL. use (nullable = true) to allow this.
+3. 默认情况下，列的值是不能为null的(如果为null，将不会保存到数据库), 必要的话可以用'@Column(canBeNull = true)'注解来允许该字段为null.
 
-## Quick Setup
+## 使用方式
 
-### 1. Download module and add to the project or direct add [dependencies](#Download)
+### 1. 下载easydao module并添加到工程或者直接添加[依赖](#依赖)
 
-### 2. get DB singleton object
+### 2. 获取DB单例对象
     ```java
     IDAO<UserBean> dao = DB.getInstance(mContext).getDatabase(1, database, listener);
     ```
-     there is no tableName and entityClass parameter, called```IDAO.initTable(String, Class)``` to init table.
+     上面这个方法没有传入tableName和entityClass参数, 故无法进行表数据相关操作，比如增删改查。可再调用```IDAO.initTable(String, Class)``` 方法来进行初始化.
 
-     or
+     或者直接使用下面这个方法。注：数据库和表不存在的时候，会自动创建！
 
     ```java
     IDAO<UserBean> dao = DB.getInstance(mContext)
                            .getDatabase(1, databaseName, tablename, UserBean.class, listener);
     ```
-### 3. CRUD
-IDAO<T> interface provides the following methods for CRUD
+### 3. 增删改查
+IDAO<T>提供了以下方法进行数据库的增删改查等操作。
 
 ```java
 /**
- * get the sqlite database object
+ * 获取数据库操作对象
  *
  * @return
  */
 SQLiteDatabase getDatabase();
 
 /**
- * init table name and entityClass
+ * 初始化表映射关系
  *
  * @param tableName
  * @param clazz
@@ -86,7 +82,7 @@ SQLiteDatabase getDatabase();
 void initTable(String tableName, Class<T> clazz);
 
 /**
- * get count of entities
+ * 获取表数据量
  *
  * @return
  * @throws DBException
@@ -96,7 +92,7 @@ long getCount() throws DBException;
 boolean isTableExist(String tableName) throws DBException;
 
 /**
- * check table exists
+ * 检查表是否存在
  *
  * @return
  * @throws DBException
@@ -104,36 +100,36 @@ boolean isTableExist(String tableName) throws DBException;
 boolean isTableExist() throws DBException;
 
 /**
- * create table
+ * 建表
  *
  * @throws DBException
  */
 void createTable() throws DBException;
 
 /**
- * create table
+ * 建表
  *
- * @param tableName table name
+ * @param tableName 表名
  * @throws DBException
  */
 <T> void createTable(Class<T> entityClass, String tableName) throws DBException;
 
 /**
- * drop table
+ * 删除表
  *
  * @throws DBException
  */
 void dropTable() throws DBException;
 
 /**
- * drop all table
+ * 删除数据库所有的表
  *
  * @throws DBException
  */
 void dropAllTable() throws DBException;
 
 /**
- * save database entity
+ * 保存数据
  *
  * @param entity
  * @throws DBException
@@ -141,7 +137,7 @@ void dropAllTable() throws DBException;
 void save(T entity) throws DBException;
 
 /**
- * delete database entity by id(primary key)
+ * 通过id(主键)删除数据
  *
  * @param id
  * @throws DBException
@@ -149,7 +145,7 @@ void save(T entity) throws DBException;
 void delete(int id) throws DBException;
 
 /**
- * delete database entity by ids(primary key)
+ * 通过多个id(主键)删除数据
  *
  * @param ids
  * @throws DBException
@@ -157,14 +153,14 @@ void delete(int id) throws DBException;
 void delete(int[] ids) throws DBException;
 
 /**
- * delete all data
+ * 删除所有数据
  *
  * @throws DBException
  */
 void deleteAll() throws DBException;
 
 /**
- * update entity
+ * 更新一条数据
  *
  * @param entity
  * @throws DBException
@@ -172,18 +168,18 @@ void deleteAll() throws DBException;
 void update(T entity) throws DBException;
 
 /**
- * update entity by a condition string
+ * 通过条件语句更新数据
  *
- * @param condition part of the update SQL command after keyword 'WHERE'
- *                  (i.e."UPDATE Person SET age = 35 WHERE condition")
- *                  (e.g. condition -- "name = 'Richard' OR name = 'Jefferson'")
+ * @param condition 是更新语句在'WHERE'后面的一部分
+ *                  (即："UPDATE Person SET age = 35 WHERE condition")
+ *                  (举个栗子： condition -- "name = 'Richard' OR name = 'Jefferson'")
  * @param entity
  * @throws DBException
  */
 void updateByCondition(String condition, T entity) throws DBException;
 
 /**
- * find entity by id
+ * 通过id查找数据
  *
  * @param id
  * @return
@@ -192,7 +188,7 @@ void updateByCondition(String condition, T entity) throws DBException;
 T find(int id) throws DBException;
 
 /**
- * find last entity
+ * 查找表中最后一条数据
  *
  * @return
  * @throws DBException
@@ -200,17 +196,17 @@ T find(int id) throws DBException;
 T findLastEntity() throws DBException;
 
 /**
- * find entities by a condition string
+ * 通过条件语句查询数据
  *
- * @param condition part of the select SQL command after keyword 'WHERE'
- *                  (i.e."SELECT * FROM Person WHERE condition")
- *                  (e.g. condition -- "name = 'Richard' OR name = 'Jefferson'")
+ * @param condition 是查询语句在'WHERE'后面的这部分
+ *                  (即："SELECT * FROM Person WHERE condition")
+ *                  (举个栗子： condition -- "name = 'Richard' OR name = 'Jefferson'")
  * @return
  */
 List<T> findByCondition(String condition) throws DBException;
 
 /**
- * find all entities
+ * 查询所有数据
  *
  * @return
  * @throws DBException
