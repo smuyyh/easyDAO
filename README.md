@@ -52,7 +52,7 @@ You may notice this if you want to find with condition.
 
 ## Quick Setup
 
-### 1. Download module and add to the project or direct add [dependencies](#Download)
+### 1. Download module and add to the project or direct add [dependencies](#download)
 
 ### 2. get DB singleton object
 ```java
