@@ -28,7 +28,7 @@ dependencies {
    and use the returned value to operate the database.
 ```
 
-## Notices
+## Notices(important!!!)
 
 1. The name of getter/setter method MUST strictly follow the rule: getElement, setElement, setOk, isOk.
 (i.e. get/set + element name with the first character in upper case),
@@ -55,17 +55,17 @@ You may notice this if you want to find with condition.
 ### 1. Download module and add to the project or direct add [dependencies](#Download)
 
 ### 2. get DB singleton object
-    ```java
-    IDAO<UserBean> dao = DB.getInstance(mContext).getDatabase(1, database, listener);
-    ```
-     there is no tableName and entityClass parameter, called```IDAO.initTable(String, Class)``` to init table.
+```java
+IDAO<UserBean> dao = DB.getInstance(mContext).getDatabase(1, database, listener);
+```
+  there is no tableName and entityClass parameter, called```IDAO.initTable(String, Class)``` to init table.
 
-     or
+  or
 
-    ```java
-    IDAO<UserBean> dao = DB.getInstance(mContext)
-                           .getDatabase(1, databaseName, tablename, UserBean.class, listener);
-    ```
+```java
+IDAO<UserBean> dao = DB.getInstance(mContext)
+                       .getDatabase(1, databaseName, tablename, UserBean.class, listener);
+```
 ### 3. CRUD
 IDAO<T> interface provides the following methods for CRUD
 
