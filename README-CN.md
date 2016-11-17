@@ -28,8 +28,7 @@ dependencies {
 
 ## 注意事项（重要！！！）
 
-1. getter/setter方法必须严格遵循以下规则: getElement, setElement (即: get/set + 首字母大写的属性名).
-这里需要注意的是，通过eclipse或as自动生成的Bool类型的getter/setter方法也是遵循该规律的，请勿手动再改。如下：
+1. getter/setter方法必须严格遵循以下规则: getElement, setElement (即: get/set + 首字母大写的属性名).这里需要注意的是，通过eclipse或as自动生成的Bool类型的getter/setter方法也是遵循该规律的，请勿手动再改。如下：
     ```java
     @Column
     private boolean isOk;
@@ -49,19 +48,21 @@ dependencies {
 ## 使用方式
 
 ### 1. 下载easydao module并添加到工程或者直接添加[依赖](#依赖)
+xxx
 
 ### 2. 获取DB单例对象
-    ```java
+```java
     IDAO<UserBean> dao = DB.getInstance(mContext).getDatabase(1, database, listener);
-    ```
-     上面这个方法没有传入tableName和entityClass参数, 故无法进行表数据相关操作，比如增删改查。可再调用```IDAO.initTable(String, Class)``` 方法来进行初始化.
+```
+    
+上面这个方法没有传入tableName和entityClass参数, 故无法进行表数据相关操作，比如增删改查。可再调用```IDAO.initTable(String, Class)``` 方法来进行初始化.
 
-     或者直接使用下面这个方法。注：数据库和表不存在的时候，会自动创建！
+或者直接使用下面这个方法。注：数据库和表不存在的时候，会自动创建！
 
-    ```java
+```java
     IDAO<UserBean> dao = DB.getInstance(mContext)
                            .getDatabase(1, databaseName, tablename, UserBean.class, listener);
-    ```
+```
 ### 3. 增删改查
 IDAO<T>提供了以下方法进行数据库的增删改查等操作。
 
