@@ -272,6 +272,7 @@ public class MainActivity extends AppCompatActivity {
                             ToastUtils.showSingleToast("delete successed!");
                         } catch (DBException e) {
                             e.printStackTrace();
+                            ToastUtils.showSingleToast(e.getDesc());
                         } catch (NumberFormatException e) {
                             ToastUtils.showSingleToast(e.toString());
                         }

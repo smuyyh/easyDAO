@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2016 smuyyh
- * <p/>
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p/>
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,6 +24,7 @@ import android.text.TextUtils;
 
 import com.yuyh.easydao.base.BaseEntity;
 import com.yuyh.easydao.exception.DBException;
+import com.yuyh.easydao.exception.ErrMsg;
 import com.yuyh.easydao.interfaces.IDAO;
 import com.yuyh.easydao.utils.LogUtils;
 import com.yuyh.easydao.utils.ORMUtils;
@@ -132,7 +133,7 @@ public class DAO<T extends BaseEntity> extends SQLiteOpenHelper implements IDAO<
             long total = cursor.getLong(0);
             return total;
         } catch (Exception e) {
-            throw new DBException(null);
+            throw new DBException(ErrMsg.ERR_GET_COUNT);
         } finally {
             closeDB();
         }
@@ -148,6 +149,7 @@ public class DAO<T extends BaseEntity> extends SQLiteOpenHelper implements IDAO<
             openDB(false);
 
             String sql = "SELECT COUNT(*) FROM Sqlite_master WHERE TYPE ='table' AND NAME ='" + tableName.trim() + "' ";
+            LogUtils.d(sql);
             Cursor cursor = db.rawQuery(sql, null);
             if (cursor.moveToNext()) {
                 int count = cursor.getInt(0);
@@ -157,8 +159,7 @@ public class DAO<T extends BaseEntity> extends SQLiteOpenHelper implements IDAO<
             }
             return isExist;
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new DBException(null);
+            throw new DBException(ErrMsg.ERR_IS_TABLE_EXISTS);
         } finally {
             closeDB();
         }
@@ -179,12 +180,12 @@ public class DAO<T extends BaseEntity> extends SQLiteOpenHelper implements IDAO<
         try {
             openDB(true);
 
-            String strCreateTable = ORMUtils.genCreateTableSQL(entityClass, tableName);
-            LogUtils.i(strCreateTable);
-            db.execSQL(strCreateTable);
+            String sql = ORMUtils.genCreateTableSQL(entityClass, tableName);
+            LogUtils.i(sql);
+            db.execSQL(sql);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new DBException(null);
+            throw new DBException(ErrMsg.ERR_CREATE_TABLE, e);
         } finally {
             closeDB();
         }
@@ -195,13 +196,13 @@ public class DAO<T extends BaseEntity> extends SQLiteOpenHelper implements IDAO<
         try {
             openDB(true);
 
-            String delSql = "DROP TABLE " + mTableName;
-            LogUtils.d(delSql);
+            String sql = "DROP TABLE " + mTableName;
+            LogUtils.d(sql);
             db.beginTransaction();
-            db.execSQL(delSql);
+            db.execSQL(sql);
             db.setTransactionSuccessful();
         } catch (Exception e) {
-            throw new DBException(null);
+            throw new DBException(ErrMsg.ERR_DROP_TABLE, e);
         } finally {
             db.endTransaction();
             closeDB();
@@ -223,13 +224,14 @@ public class DAO<T extends BaseEntity> extends SQLiteOpenHelper implements IDAO<
                 if (name.equals("sqlite_sequence")) {
                     continue;
                 }
-                String strDelSql = "DROP TABLE " + name;
-                LogUtils.d(strDelSql);
-                db.execSQL(strDelSql);
+                String sql = "DROP TABLE " + name;
+                LogUtils.d(sql);
+                db.execSQL(sql);
             }
             db.setTransactionSuccessful();
         } catch (Exception e) {
-            throw new DBException(null);
+            e.printStackTrace();
+            throw new DBException(ErrMsg.ERR_DROP_TABLE, e);
         } finally {
             db.endTransaction();
             closeDB();
@@ -244,15 +246,15 @@ public class DAO<T extends BaseEntity> extends SQLiteOpenHelper implements IDAO<
 
             values = Utils.putValue(fields, entity);
             if (values == null || values.size() <= 0) {
-                throw new DBException(null);
+                throw new DBException(ErrMsg.ERR_SAVE_PARAM);
             }
 
             long flag = db.insert(mTableName, null, values);
             if (flag < 1) {
-                throw new DBException(null);
+                throw new DBException(ErrMsg.ERR_SAVE_PARAM);
             }
         } catch (Exception e) {
-            throw new DBException(null);
+            throw new DBException(ErrMsg.ERR_SAVE_PARAM, e);
         } finally {
             closeDB();
         }
@@ -267,12 +269,12 @@ public class DAO<T extends BaseEntity> extends SQLiteOpenHelper implements IDAO<
     public void delete(int[] ids) throws DBException {
         int length = ids == null ? 0 : ids.length;
         if (length <= 0) {
-            throw new DBException(null);
+            throw new DBException(ErrMsg.ERR_DEL_PARAM);
         }
 
         Field pkField = ORMUtils.getPKField(fields);
         if (pkField == null) {
-            throw new DBException(null);
+            throw new DBException(ErrMsg.ERR_GET_PRIMARY_KEY);
         }
 
         Class pkType = pkField.getType();
@@ -310,7 +312,7 @@ public class DAO<T extends BaseEntity> extends SQLiteOpenHelper implements IDAO<
             LogUtils.d(sbSql.toString());
             db.execSQL(sbSql.toString());
         } catch (Exception e) {
-            throw new DBException(null);
+            throw new DBException(ErrMsg.ERR_DEL, e);
         } finally {
             closeDB();
         }
@@ -332,7 +334,7 @@ public class DAO<T extends BaseEntity> extends SQLiteOpenHelper implements IDAO<
             LogUtils.d(delSql);
             LogUtils.d(revSeqSql);
         } catch (Exception e) {
-            throw new DBException(null);
+            throw new DBException(ErrMsg.ERR_DEL, e);
         } finally {
             db.endTransaction();
             closeDB();
@@ -342,17 +344,17 @@ public class DAO<T extends BaseEntity> extends SQLiteOpenHelper implements IDAO<
     @Override
     public void update(T entity) throws DBException {
         if (entity == null) {
-            throw new DBException(null);
+            throw new DBException(ErrMsg.ERR_UPDATE_PARAM);
         }
 
         Field pkField = ORMUtils.getPKField(fields);
         if (pkField == null) {
-            throw new DBException(null);
+            throw new DBException(ErrMsg.ERR_GET_PRIMARY_KEY);
         }
 
         Object pkValue = Utils.getPropValue(entity, pkField, entityClass);
         if (pkValue == null) {
-            throw new DBException(null);
+            throw new DBException(ErrMsg.ERR_GET_PRIMARY_KEY_VALUE);
         }
 
         ContentValues values;
@@ -362,16 +364,16 @@ public class DAO<T extends BaseEntity> extends SQLiteOpenHelper implements IDAO<
 
             values = Utils.putValue(fields, entity);
             if (values.size() <= 0) {
-                throw new DBException(null);
+                throw new DBException(ErrMsg.ERR_UPDATE_PARAM);
             }
 
             int flag = db.update(mTableName, values, pkField.getName() + "=?",
                     new String[]{String.valueOf(pkValue)});
             if (flag < 1) {
-                throw new DBException(null);
+                throw new DBException(ErrMsg.ERR_UPDATE_PARAM);
             }
         } catch (Exception e) {
-            throw new DBException(null);
+            throw new DBException(ErrMsg.ERR_UPDATE, e);
         } finally {
             closeDB();
         }
@@ -380,7 +382,7 @@ public class DAO<T extends BaseEntity> extends SQLiteOpenHelper implements IDAO<
     @Override
     public void updateByCondition(String condition, T entity) throws DBException {
         if (entity == null) {
-            throw new DBException(null);
+            throw new DBException(ErrMsg.ERR_UPDATE_PARAM);
         }
 
         ContentValues values;
@@ -391,16 +393,16 @@ public class DAO<T extends BaseEntity> extends SQLiteOpenHelper implements IDAO<
             values = Utils.putValue(fields, entity);
             values.remove("id");
             if (values.size() <= 0) {
-                throw new DBException(null);
+                throw new DBException(ErrMsg.ERR_UPDATE_PARAM);
             }
 
             int flag = db.update(mTableName, values, condition, null);
             if (flag < 1) {
-                throw new DBException(null);
+                throw new DBException(ErrMsg.ERR_UPDATE_PARAM);
             }
 
         } catch (Exception e) {
-            throw new DBException(null);
+            throw new DBException(ErrMsg.ERR_UPDATE, e);
         } finally {
             closeDB();
         }
@@ -410,7 +412,7 @@ public class DAO<T extends BaseEntity> extends SQLiteOpenHelper implements IDAO<
     public T find(int id) throws DBException {
         Field pkField = ORMUtils.getPKField(fields);
         if (pkField == null) {
-            throw new DBException(null);
+            throw new DBException(ErrMsg.ERR_GET_PRIMARY_KEY);
         }
 
         String columnName = ORMUtils.getColumnName(pkField);
@@ -425,7 +427,7 @@ public class DAO<T extends BaseEntity> extends SQLiteOpenHelper implements IDAO<
                 return objList.get(0);
             }
         } catch (Exception e) {
-            throw new DBException(null);
+            throw new DBException(ErrMsg.ERR_FIND, e);
         } finally {
             closeDB();
         }
@@ -436,7 +438,7 @@ public class DAO<T extends BaseEntity> extends SQLiteOpenHelper implements IDAO<
     public T findLastEntity() throws DBException {
         Field pkField = ORMUtils.getPKField(fields);
         if (pkField == null) {
-            throw new DBException(null);
+            throw new DBException(ErrMsg.ERR_GET_PRIMARY_KEY);
         }
 
         String columnName = ORMUtils.getColumnName(pkField);
@@ -451,7 +453,7 @@ public class DAO<T extends BaseEntity> extends SQLiteOpenHelper implements IDAO<
                 return objList.get(0);
             }
         } catch (Exception e) {
-            throw new DBException(null);
+            throw new DBException(ErrMsg.ERR_FIND, e);
         } finally {
             closeDB();
         }
@@ -495,7 +497,7 @@ public class DAO<T extends BaseEntity> extends SQLiteOpenHelper implements IDAO<
                 return objList;
             }
         } catch (Exception e) {
-            throw new DBException(null);
+            throw new DBException(ErrMsg.ERR_FIND, e);
         } finally {
             closeDB();
         }
@@ -510,7 +512,7 @@ public class DAO<T extends BaseEntity> extends SQLiteOpenHelper implements IDAO<
      */
     private void openDB(boolean checkTable) throws DBException {
         if (checkTable && TextUtils.isEmpty(mTableName)) {
-            throw new DBException(null);
+            throw new DBException(ErrMsg.ERR_IS_TABLE_EXISTS);
         }
         db = getWritableDatabase();
     }
