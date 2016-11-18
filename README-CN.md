@@ -14,7 +14,7 @@ easyDAO是一个快速&轻量级的Android SQLite ORM映射框架，尽可能的
 ## 依赖
 ```
 dependencies {
-    compile 'com.yuyh.easydao:easydao:1.0.0'
+    compile 'com.yuyh.easydao:easydao:1.1.0'
 }
 ```
 

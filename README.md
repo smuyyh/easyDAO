@@ -14,7 +14,7 @@ easyDAO is a light-weight&amp;fast ORM library for Android that maps objects to 
 ## Download
 ```
 dependencies {
-    compile 'com.yuyh.easydao:easydao:1.0.0'
+    compile 'com.yuyh.easydao:easydao:1.1.0'
 }
 ```
 
