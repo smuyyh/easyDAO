@@ -60,6 +60,7 @@ public class DB implements IDB {
     private Context mContext;
 
     private DB() {
+
     }
 
     private DB(Context context) {
@@ -72,9 +73,24 @@ public class DB implements IDB {
     }
 
     @Override
+    public <T extends BaseEntity> IDAO<T> getDatabase(int dbVer, String dbName, IDBListener<T> listener) throws DBException {
+        return getDatabase(dbVer, null, dbName, null, null, listener);
+    }
+
+    @Override
     public <T extends BaseEntity> IDAO<T> getDatabase(int dbVer, String dbName,
                                                       String tableName, Class<T> clazz,
                                                       IDBListener<T> listener) throws DBException {
+        return getDatabase(dbVer, null, dbName, tableName, clazz, listener);
+    }
+
+    @Override
+    public <T extends BaseEntity> IDAO<T> getDatabase(int dbVer, String key, String dbName, IDBListener<T> listener) throws DBException {
+        return getDatabase(dbVer, key, dbName, null, null, listener);
+    }
+
+    @Override
+    public <T extends BaseEntity> IDAO<T> getDatabase(int dbVer, String key, String dbName, String tableName, Class<T> clazz, IDBListener<T> listener) throws DBException {
         DAO<T> dao = new DAO<>(mContext, getDatabaseFullName(dbName), tableName, clazz, dbVer);
         if (!TextUtils.isEmpty(tableName) && !dao.isTableExist()) {
             dao.createTable();
@@ -87,11 +103,6 @@ public class DB implements IDB {
             }
         }
         return dao;
-    }
-
-    @Override
-    public <T extends BaseEntity> IDAO<T> getDatabase(int dbVer, String dbName, IDBListener<T> listener) throws DBException {
-        return getDatabase(dbVer, dbName, null, null, listener);
     }
 
     @Override

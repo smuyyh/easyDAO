@@ -2,6 +2,9 @@ package com.yuyh.easydao.exception;
 
 import android.support.annotation.StringDef;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 @StringDef({
         ErrMsg.ERR_INVALID_ID,
         ErrMsg.ERR_GET_COUNT,
@@ -15,6 +18,7 @@ import android.support.annotation.StringDef;
         ErrMsg.ERR_UPDATE_PARAM,
         ErrMsg.ERR_GET_PRIMARY_KEY_VALUE,
         ErrMsg.ERR_UPDATE,
+        ErrMsg.ERR_FIND_CONDITION,
         ErrMsg.ERR_FIND
 })
 /**
@@ -23,6 +27,7 @@ import android.support.annotation.StringDef;
  * @author yuyh.
  * @date 2016/11/18.
  */
+@Retention(RetentionPolicy.SOURCE)
 public @interface ErrMsg {
 
     String ERR_INVALID_ID = "invalid entity id";
@@ -48,6 +53,8 @@ public @interface ErrMsg {
     String ERR_UPDATE_PARAM = "param error during update operation";
 
     String ERR_UPDATE = "execute SQL error during update operation";
+
+    String ERR_FIND_CONDITION = "condition can not be null";
 
     String ERR_FIND = "execute SQL error during find operation";
 }

@@ -70,6 +70,35 @@ public interface IDB {
     <T extends BaseEntity> IDAO<T> getDatabase(int dbVer, String dbName, IDBListener<T> listener) throws DBException;
 
     /**
+     * get DAO of the database, create table if not exists
+     *
+     * @param dbVer     number of the database (starting at 1)
+     * @param key       database encryption key, empty string or null means no encryption
+     * @param dbName    of the database name, it will be stored in /data/data/%package_name%/files
+     * @param tableName table name
+     * @param clazz     class of entity
+     * @param listener  database listener
+     * @param <T>
+     * @return
+     * @throws DBException
+     */
+    <T extends BaseEntity> IDAO<T> getDatabase(int dbVer, String key, String dbName, String tableName,
+                                               Class<T> clazz, IDBListener<T> listener) throws DBException;
+
+    /**
+     * get DAO of the database. there is no tableName and entityClass parameter, called{@link IDAO#initTable(String, Class)} to init table.
+     *
+     * @param dbVer    number of the database (starting at 1)
+     * @param key      database encryption key, empty string or null means no encryption
+     * @param dbName   of the database name, it will be stored in /data/data/%package_name%/files
+     * @param listener database listener
+     * @param <T>
+     * @return
+     * @throws DBException
+     */
+    <T extends BaseEntity> IDAO<T> getDatabase(int dbVer, String key, String dbName, IDBListener<T> listener) throws DBException;
+
+    /**
      * checked database exists
      *
      * @param dbName database name

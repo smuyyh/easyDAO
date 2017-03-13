@@ -20,13 +20,15 @@ import com.yuyh.easydao.annotation.Id;
 import com.yuyh.easydao.exception.DBException;
 import com.yuyh.easydao.exception.ErrMsg;
 
+import java.io.Serializable;
+
 /**
  * the abstract base class for entity in the database
  *
  * @author yuyh.
  * @date 2016/11/16.
  */
-public abstract class BaseEntity {
+public abstract class BaseEntity implements Serializable {
 
     @Id
     @AutoIncrement
